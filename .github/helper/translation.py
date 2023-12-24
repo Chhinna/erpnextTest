@@ -13,48 +13,47 @@ files = sys.argv[1:]
 files_to_scan = [_file for _file in files if _file.endswith(('.py', '.js'))]
 
 for _file in files_to_scan:
-	with open(_file, 'r') as f:
-		print(f'Checking: {_file}')
-		file_lines = f.readlines()
-		for line_number, line in enumerate(file_lines, 1):
-			if 'frappe-lint: disable-translate' in line:
-				continue
+    with open(_file, 'r', encoding='utf-8') as f:
+        print(f'Checking: {_file}')
+        file_lines = f.readlines()
+        for line_number, line in enumerate(file_lines, 1):
+            if 'frappe-lint: disable-translate' in line:
+                continue
 
-			start_matches = start_pattern.search(line)
-			if start_matches:
-				starts_with_f = starts_with_f_pattern.search(line)
+            start_matches = start_pattern.search(line)
+            if not start_matches:
+                continue
 
-				if starts_with_f:
-					has_f_string = f_string_pattern.search(line)
-					if has_f_string:
-						errors_encounter += 1
-						print(f'\nF-strings are not supported for translations at line number {line_number}\n{line.strip()[:100]}')
-						continue
-					else:
-						continue
+            starts_with_f = starts_with_f_pattern.search(line)
 
-				match = pattern.search(line)
-				error_found = False
+            if starts_with_f:
+                has_f_string = f_string_pattern.search(line)
+                if has_f_string:
+                    errors_encounter += 1
+                    print(f'\nF-strings are not supported for translations at line number {line_number}\n{line.strip()[:100]}')
+                    continue
+                continue
 
-				if not match and line.endswith((',\n', '[\n')):
-					# concat remaining text to validate multiline pattern
-					line = "".join(file_lines[line_number - 1:])
-					line = line[start_matches.start() + 1:]
-					match = pattern.match(line)
+            match = pattern.search(line)
+            error_found = False
 
-				if not match:
-					error_found = True
-					print(f'\nTranslation syntax error at line number {line_number}\n{line.strip()[:100]}')
+            if not match and line.endswith((',\n', '[\n')):
+                line = "".join(file_lines[line_number - 1:])
+                line = line[start_matches.start() + 1:]
+                match = pattern.match(line)
 
-				if not error_found and not words_pattern.search(line):
-					error_found = True
-					print(f'\nTranslation is useless because it has no words at line number {line_number}\n{line.strip()[:100]}')
+            if not match:
+                error_found = True
+                print(f'\nTranslation syntax error at line number {line_number}\n{line.strip()[:100]}')
+            if not error_found and (not words_pattern.search(line)):
+                error_found = True
+                print(f'\nTranslation is useless because it has no words at line number {line_number}\n{line.strip()[:100]}')
 
-				if error_found:
-					errors_encounter += 1
+            if error_found:
+                errors_encounter += 1
 
 if errors_encounter > 0:
-	print('\nVisit "https://frappeframework.com/docs/user/en/translations" to learn about valid translation strings.')
-	sys.exit(1)
+    print('\nVisit "https://frappeframework.com/docs/user/en/translations" to learn about valid translation strings.')
+    sys.exit(1)
 else:
-	print('\nGood To Go!')
+    print('\nGood To Go!')
