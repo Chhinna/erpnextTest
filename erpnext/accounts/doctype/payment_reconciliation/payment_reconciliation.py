@@ -495,12 +495,12 @@ class PaymentReconciliation(Document):
 	def reconcile(self):
 		if frappe.db.get_single_value("Accounts Settings", "auto_reconcile_payments"):
 			running_doc = is_any_doc_running(
-				dict(
+				{
 					company=self.company,
 					party_type=self.party_type,
 					party=self.party,
 					receivable_payable_account=self.receivable_payable_account,
-				)
+				}
 			)
 
 			if running_doc:

@@ -1266,21 +1266,7 @@ class TestPaymentEntry(FrappeTestCase):
 		si2.payment_terms_template = "Test Receivable Template"
 		si2.submit()
 
-		args = {
-			"posting_date": nowdate(),
-			"company": "_Test Company",
-			"party_type": "Customer",
-			"payment_type": "Pay",
-			"party": customer,
-			"party_account": "Debtors - _TC",
-		}
-		args.update(
-			{
-				"get_outstanding_invoices": True,
-				"from_posting_date": add_days(nowdate(), -4),
-				"to_posting_date": add_days(nowdate(), 2),
-			}
-		)
+		args = {"posting_date": nowdate(), "company": "_Test Company", "party_type": "Customer", "payment_type": "Pay", "party": customer, "party_account": "Debtors - _TC", "get_outstanding_invoices": True, "from_posting_date": add_days(nowdate(), -4), "to_posting_date": add_days(nowdate(), 2)}
 		references = get_outstanding_reference_documents(args)
 
 		self.assertEqual(len(references), 3)

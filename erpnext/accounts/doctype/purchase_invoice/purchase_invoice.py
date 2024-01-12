@@ -371,7 +371,7 @@ class PurchaseInvoice(BuyingController):
 		check_list = []
 
 		for d in self.get("items"):
-			if d.purchase_order and not d.purchase_order in check_list and not d.purchase_receipt:
+			if d.purchase_order and d.purchase_order not in check_list and not d.purchase_receipt:
 				check_list.append(d.purchase_order)
 				check_on_hold_or_closed_status("Purchase Order", d.purchase_order)
 
@@ -544,10 +544,7 @@ class PurchaseInvoice(BuyingController):
 			validate_account_head(item.idx, item.expense_account, self.company, "Expense")
 
 	def set_against_expense_account(self):
-		against_accounts = []
-		for item in self.get("items"):
-			if item.expense_account and (item.expense_account not in against_accounts):
-				against_accounts.append(item.expense_account)
+		against_accounts = [item.expense_account for item in self.get("items") if item.expense_account and item.expense_account not in against_accounts]
 
 		self.against_expense_account = ",".join(against_accounts)
 
@@ -853,7 +850,7 @@ class PurchaseInvoice(BuyingController):
 		valuation_tax_accounts = [
 			d.account_head
 			for d in self.get("taxes")
-			if d.category in ("Valuation", "Total and Valuation")
+			if d.category in {"Valuation", "Total and Valuation"}
 			and flt(d.base_tax_amount_after_discount_amount)
 		]
 
@@ -1189,7 +1186,7 @@ class PurchaseInvoice(BuyingController):
 
 		for tax in self.get("taxes"):
 			amount, base_amount = self.get_tax_amounts(tax, None)
-			if tax.category in ("Total", "Valuation and Total") and flt(base_amount):
+			if tax.category in {"Total", "Valuation and Total"} and flt(base_amount):
 				account_currency = get_account_currency(tax.account_head)
 
 				dr_or_cr = "debit" if tax.add_deduct_tax == "Add" else "credit"
@@ -1212,7 +1209,7 @@ class PurchaseInvoice(BuyingController):
 			# accumulate valuation tax
 			if (
 				self.is_opening == "No"
-				and tax.category in ("Valuation", "Valuation and Total")
+				and tax.category in {"Valuation", "Valuation and Total"}
 				and flt(base_amount)
 				and not self.is_internal_transfer()
 			):

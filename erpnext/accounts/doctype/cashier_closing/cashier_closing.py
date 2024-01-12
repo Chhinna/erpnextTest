@@ -54,9 +54,7 @@ class CashierClosing(Document):
 		self.outstanding_amount = flt(values[0][0] if values else 0)
 
 	def make_calculations(self):
-		total = 0.00
-		for i in self.payments:
-			total += flt(i.amount)
+		total = sum((flt(i.amount) for i in self.payments))
 
 		self.net_amount = (
 			total + self.outstanding_amount + flt(self.expense) - flt(self.custody) + flt(self.returns)

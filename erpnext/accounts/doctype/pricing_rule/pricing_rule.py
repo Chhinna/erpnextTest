@@ -195,18 +195,12 @@ class PricingRule(Document):
 		if not self.selling and not self.buying:
 			throw(_("Atleast one of the Selling or Buying must be selected"))
 
-		if not self.selling and self.applicable_for in [
-			"Customer",
-			"Customer Group",
-			"Territory",
-			"Sales Partner",
-			"Campaign",
-		]:
+		if not self.selling and self.applicable_for in {"Customer", "Customer Group", "Territory", "Sales Partner", "Campaign"}:
 			throw(
 				_("Selling must be checked, if Applicable For is selected as {0}").format(self.applicable_for)
 			)
 
-		if not self.buying and self.applicable_for in ["Supplier", "Supplier Group"]:
+		if not self.buying and self.applicable_for in {"Supplier", "Supplier Group"}:
 			throw(
 				_("Buying must be checked, if Applicable For is selected as {0}").format(self.applicable_for)
 			)
@@ -286,7 +280,7 @@ class PricingRule(Document):
 	def validate_price_list_with_currency(self):
 		if self.currency and self.for_price_list:
 			price_list_currency = frappe.db.get_value("Price List", self.for_price_list, "currency", True)
-			if not self.currency == price_list_currency:
+			if self.currency != price_list_currency:
 				throw(_("Currency should be same as Price List Currency: {0}").format(price_list_currency))
 
 	def validate_dates(self):
@@ -353,7 +347,7 @@ def apply_pricing_rule(args, doc=None):
 		filters=[["item_code", "in", item_code_list]],
 		as_list=1,
 	)
-	serialized_items = dict()
+	serialized_items = {}
 	for item_code, val in query_items:
 		serialized_items.setdefault(item_code, val)
 
@@ -460,7 +454,7 @@ def get_pricing_rule_for_item(args, doc=None, for_validate=False):
 				if pricing_rule.apply_rule_on_other_items:
 					item_details["apply_rule_on_other_items"] = json.dumps(pricing_rule.apply_rule_on_other_items)
 
-			if pricing_rule.coupon_code_based == 1 and args.coupon_code == None:
+			if pricing_rule.coupon_code_based == 1 and args.coupon_code is None:
 				return item_details
 
 			if not pricing_rule.validate_applied_rule:
@@ -536,7 +530,7 @@ def apply_price_discount_rule(pricing_rule, item_details, args):
 	item_details.pricing_rule_for = pricing_rule.rate_or_discount
 
 	if (
-		pricing_rule.margin_type in ["Amount", "Percentage"] and pricing_rule.currency == args.currency
+		pricing_rule.margin_type in {"Amount", "Percentage"} and pricing_rule.currency == args.currency
 	) or (pricing_rule.margin_type == "Percentage"):
 		item_details.margin_type = pricing_rule.margin_type
 		item_details.has_margin = True
@@ -599,7 +593,7 @@ def remove_pricing_rule_for_item(pricing_rules, item_details, item_code=None, ra
 			if pricing_rule.rate_or_discount == "Discount Amount":
 				item_details.discount_amount = 0.0
 
-			if pricing_rule.margin_type in ["Percentage", "Amount"]:
+			if pricing_rule.margin_type in {"Percentage", "Amount"}:
 				item_details.margin_rate_or_amount = 0.0
 				item_details.margin_type = None
 		elif pricing_rule.get("free_item"):
@@ -643,15 +637,9 @@ def remove_pricing_rules(item_list):
 def set_transaction_type(args):
 	if args.transaction_type:
 		return
-	if args.doctype in ("Opportunity", "Quotation", "Sales Order", "Delivery Note", "Sales Invoice"):
+	if args.doctype in {"Opportunity", "Quotation", "Sales Order", "Delivery Note", "Sales Invoice"}:
 		args.transaction_type = "selling"
-	elif args.doctype in (
-		"Material Request",
-		"Supplier Quotation",
-		"Purchase Order",
-		"Purchase Receipt",
-		"Purchase Invoice",
-	):
+	elif args.doctype in {"Material Request", "Supplier Quotation", "Purchase Order", "Purchase Receipt", "Purchase Invoice"}:
 		args.transaction_type = "buying"
 	elif args.customer:
 		args.transaction_type = "selling"

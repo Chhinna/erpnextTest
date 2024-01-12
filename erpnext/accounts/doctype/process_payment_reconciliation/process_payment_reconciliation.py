@@ -106,9 +106,7 @@ def get_pr_instance(doc: str):
 		"from_payment_date",
 		"to_payment_date",
 	]
-	d = {}
-	for field in fields:
-		d[field] = process_payment_reconciliation.get(field)
+	d = {field: process_payment_reconciliation.get(field) for field in fields}
 	pr.update(d)
 	pr.invoice_limit = 1000
 	pr.payment_limit = 1000
@@ -117,9 +115,7 @@ def get_pr_instance(doc: str):
 
 def is_job_running(job_name: str) -> bool:
 	jobs = frappe.db.get_all("RQ Job", filters={"status": ["in", ["started", "queued"]]})
-	for x in jobs:
-		if x.job_name == job_name:
-			return True
+	return any(x.job_name == job_name for x in jobs)
 	return False
 
 
@@ -475,7 +471,7 @@ def reconcile(doc: None | str = None) -> None:
 						frappe.db.set_value("Process Payment Reconciliation", doc, "status", "Completed")
 					else:
 
-						if not (frappe.db.get_value("Process Payment Reconciliation", doc, "status") == "Paused"):
+						if frappe.db.get_value("Process Payment Reconciliation", doc, "status") != "Paused":
 							# trigger next batch in job
 							# generate reconcile job name
 							allocation = get_next_allocation(log)

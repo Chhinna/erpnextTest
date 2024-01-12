@@ -45,12 +45,12 @@ class TestPaymentOrder(unittest.TestCase):
 
 def create_payment_order_against_payment_entry(ref_doc, order_type):
 	payment_order = frappe.get_doc(
-		dict(
+		{
 			doctype="Payment Order",
 			company="_Test Company",
 			payment_order_type=order_type,
 			company_bank_account="Checking Account - Citi Bank",
-		)
+		}
 	)
 	doc = make_payment_order(ref_doc.name, payment_order)
 	doc.save()

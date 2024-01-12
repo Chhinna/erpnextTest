@@ -66,12 +66,7 @@ class POSClosingEntry(StatusUpdater):
 		for idx, inv in enumerate(self.pos_transactions, 1):
 			pos_occurences.setdefault(inv.pos_invoice, []).append(idx)
 
-		error_list = []
-		for key, value in pos_occurences.items():
-			if len(value) > 1:
-				error_list.append(
-					_("{} is added multiple times on rows: {}".format(frappe.bold(key), frappe.bold(value)))
-				)
+		error_list = [_("{} is added multiple times on rows: {}".format(frappe.bold(key), frappe.bold(value))) for (key, value) in pos_occurences.items() if len(value) > 1]
 
 		if error_list:
 			frappe.throw(error_list, title=_("Duplicate POS Invoices found"), as_list=True)
@@ -111,10 +106,7 @@ class POSClosingEntry(StatusUpdater):
 		if not invalid_rows:
 			return
 
-		error_list = []
-		for row in invalid_rows:
-			for msg in row.get("msg"):
-				error_list.append(_("Row #{}: {}").format(row.get("idx"), msg))
+		error_list = [_("Row #{}: {}").format(row.get("idx"), msg) for row in invalid_rows for msg in row.get("msg")]
 
 		frappe.throw(error_list, title=_("Invalid POS Invoices"), as_list=True)
 
@@ -147,7 +139,7 @@ class POSClosingEntry(StatusUpdater):
 @frappe.validate_and_sanitize_search_inputs
 def get_cashiers(doctype, txt, searchfield, start, page_len, filters):
 	cashiers_list = frappe.get_all("POS Profile User", filters=filters, fields=["user"], as_list=1)
-	return [c for c in cashiers_list]
+	return list(cashiers_list)
 
 
 @frappe.whitelist()
@@ -165,9 +157,7 @@ def get_pos_invoices(start, end, pos_profile, user):
 		as_dict=1,
 	)
 
-	data = list(
-		filter(lambda d: get_datetime(start) <= get_datetime(d.timestamp) <= get_datetime(end), data)
-	)
+	data = [d for d in data if get_datetime(start) <= get_datetime(d.timestamp) <= get_datetime(end)]
 	# need to get taxes and payments so can't avoid get_doc
 	data = [frappe.get_doc("POS Invoice", d.name).as_dict() for d in data]
 
@@ -195,17 +185,7 @@ def make_closing_entry_from_opening(opening_entry):
 
 	pos_transactions = []
 	taxes = []
-	payments = []
-	for detail in opening_entry.balance_details:
-		payments.append(
-			frappe._dict(
-				{
-					"mode_of_payment": detail.mode_of_payment,
-					"opening_amount": detail.opening_amount,
-					"expected_amount": detail.opening_amount,
-				}
-			)
-		)
+	payments = [frappe._dict({"mode_of_payment": detail.mode_of_payment, "opening_amount": detail.opening_amount, "expected_amount": detail.opening_amount}) for detail in opening_entry.balance_details]
 
 	for d in invoices:
 		pos_transactions.append(

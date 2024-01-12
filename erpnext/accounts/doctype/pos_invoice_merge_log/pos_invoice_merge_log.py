@@ -50,12 +50,7 @@ class POSInvoiceMergeLog(Document):
 		for idx, inv in enumerate(self.pos_invoices, 1):
 			pos_occurences.setdefault(inv.pos_invoice, []).append(idx)
 
-		error_list = []
-		for key, value in pos_occurences.items():
-			if len(value) > 1:
-				error_list.append(
-					_("{} is added multiple times on rows: {}".format(frappe.bold(key), frappe.bold(value)))
-				)
+		error_list = [_("{} is added multiple times on rows: {}".format(frappe.bold(key), frappe.bold(value))) for (key, value) in pos_occurences.items() if len(value) > 1]
 
 		if error_list:
 			frappe.throw(error_list, title=_("Duplicate POS Invoices found"), as_list=True)

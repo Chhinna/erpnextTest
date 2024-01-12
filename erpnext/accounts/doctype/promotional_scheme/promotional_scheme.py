@@ -314,7 +314,7 @@ def set_args(args, pr, doc, child_doc, discount_fields, child_doc_fields):
 	pr.update(args)
 	for field in other_fields + discount_fields:
 		target_field = field
-		if target_field in ["min_amount", "max_amount"]:
+		if target_field in {"min_amount", "max_amount"}:
 			target_field = "min_amt" if field == "min_amount" else "max_amt"
 
 		pr.set(target_field, child_doc_fields.get(field))
@@ -341,9 +341,7 @@ def get_args_for_pricing_rule(doc):
 
 	for d in pricing_rule_fields:
 		if d == applicable_for:
-			items = []
-			for applicable_for_values in doc.get(applicable_for):
-				items.append(applicable_for_values.get(applicable_for))
+			items = [applicable_for_values.get(applicable_for) for applicable_for_values in doc.get(applicable_for)]
 			args[d] = items
 		else:
 			args[d] = doc.get(d)

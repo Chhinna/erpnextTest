@@ -39,7 +39,7 @@ class TestBankTransaction(FrappeTestCase):
 	def test_linked_payments(self):
 		bank_transaction = frappe.get_doc(
 			"Bank Transaction",
-			dict(description="Re 95282925234 FE/000002917 AT171513000281183046 Conrad Electronic"),
+			{description="Re 95282925234 FE/000002917 AT171513000281183046 Conrad Electronic"},
 		)
 		linked_payments = get_linked_payments(
 			bank_transaction.name,
@@ -53,9 +53,9 @@ class TestBankTransaction(FrappeTestCase):
 	def test_reconcile(self):
 		bank_transaction = frappe.get_doc(
 			"Bank Transaction",
-			dict(description="1512567 BG/000003025 OPSKATTUZWXXX AT776000000098709849 Herr G"),
+			{description="1512567 BG/000003025 OPSKATTUZWXXX AT776000000098709849 Herr G"},
 		)
-		payment = frappe.get_doc("Payment Entry", dict(party="Mr G", paid_amount=1700))
+		payment = frappe.get_doc("Payment Entry", {party="Mr G", paid_amount=1700})
 		vouchers = json.dumps(
 			[
 				{
@@ -85,7 +85,7 @@ class TestBankTransaction(FrappeTestCase):
 	def test_debit_credit_output(self):
 		bank_transaction = frappe.get_doc(
 			"Bank Transaction",
-			dict(description="Auszahlung Karte MC/000002916 AUTOMAT 698769 K002 27.10. 14:07"),
+			{description="Auszahlung Karte MC/000002916 AUTOMAT 698769 K002 27.10. 14:07"},
 		)
 		linked_payments = get_linked_payments(
 			bank_transaction.name,
@@ -99,9 +99,9 @@ class TestBankTransaction(FrappeTestCase):
 	def test_already_reconciled(self):
 		bank_transaction = frappe.get_doc(
 			"Bank Transaction",
-			dict(description="1512567 BG/000002918 OPSKATTUZWXXX AT776000000098709837 Herr G"),
+			{description="1512567 BG/000002918 OPSKATTUZWXXX AT776000000098709837 Herr G"},
 		)
-		payment = frappe.get_doc("Payment Entry", dict(party="Mr G", paid_amount=1200))
+		payment = frappe.get_doc("Payment Entry", {party="Mr G", paid_amount=1200})
 		vouchers = json.dumps(
 			[
 				{
@@ -115,9 +115,9 @@ class TestBankTransaction(FrappeTestCase):
 
 		bank_transaction = frappe.get_doc(
 			"Bank Transaction",
-			dict(description="1512567 BG/000002918 OPSKATTUZWXXX AT776000000098709837 Herr G"),
+			{description="1512567 BG/000002918 OPSKATTUZWXXX AT776000000098709837 Herr G"},
 		)
-		payment = frappe.get_doc("Payment Entry", dict(party="Mr G", paid_amount=1200))
+		payment = frappe.get_doc("Payment Entry", {party="Mr G", paid_amount=1200})
 		vouchers = json.dumps(
 			[
 				{
@@ -138,9 +138,9 @@ class TestBankTransaction(FrappeTestCase):
 	def test_clear_sales_invoice(self):
 		bank_transaction = frappe.get_doc(
 			"Bank Transaction",
-			dict(description="I2015000011 VD/000002514 ATWWXXX AT4701345000003510057 Bio"),
+			{description="I2015000011 VD/000002514 ATWWXXX AT4701345000003510057 Bio"},
 		)
-		payment = frappe.get_doc("Sales Invoice", dict(customer="Fayva", status=["=", "Paid"]))
+		payment = frappe.get_doc("Sales Invoice", {customer="Fayva", status=["=", "Paid"]})
 		vouchers = json.dumps(
 			[
 				{
@@ -156,7 +156,7 @@ class TestBankTransaction(FrappeTestCase):
 			frappe.db.get_value("Bank Transaction", bank_transaction.name, "unallocated_amount"), 0
 		)
 		self.assertTrue(
-			frappe.db.get_value("Sales Invoice Payment", dict(parent=payment.name), "clearance_date")
+			frappe.db.get_value("Sales Invoice Payment", {parent=payment.name}, "clearance_date")
 			is not None
 		)
 

@@ -64,10 +64,8 @@ def get_periodwise_distribution_data(distribution_id, period_list, periodicity):
 
 	months_to_add = {"Yearly": 12, "Half-Yearly": 6, "Quarterly": 3, "Monthly": 1}[periodicity]
 
-	period_dict = {}
+	period_dict = {d.key: get_percentage(doc, d.from_date, months_to_add) for d in period_list}
 
-	for d in period_list:
-		period_dict[d.key] = get_percentage(doc, d.from_date, months_to_add)
 
 	return period_dict
 

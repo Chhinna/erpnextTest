@@ -200,7 +200,7 @@ def write_files(import_file, data):
 	extension = extension.lstrip(".")
 
 	if extension == "csv":
-		with open(full_file_path, "w", newline="") as file:
+		with open(full_file_path, 'w', newline='', encoding='utf-8') as file:
 			writer = csv.writer(file)
 			writer.writerows(data)
 	elif extension == "xlsx" or "xls":
