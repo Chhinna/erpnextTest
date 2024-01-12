@@ -60,7 +60,7 @@ class CostCenterAllocation(Document):
 		self.validate_child_cost_centers()
 
 	def validate_total_allocation_percentage(self):
-		total_percentage = sum([d.percentage for d in self.get("allocation_percentages", [])])
+		total_percentage = sum(d.percentage for d in self.get('allocation_percentages', []))
 
 		if total_percentage != 100:
 			frappe.throw(
@@ -120,7 +120,7 @@ class CostCenterAllocation(Document):
 
 	def validate_main_cost_center(self):
 		# Main cost center itself cannot be entered in child table
-		if self.main_cost_center in [d.cost_center for d in self.allocation_percentages]:
+		if self.main_cost_center in (d.cost_center for d in self.allocation_percentages):
 			frappe.throw(
 				_("Main Cost Center {0} cannot be entered in the child table").format(self.main_cost_center),
 				MainCostCenterCantBeChild,

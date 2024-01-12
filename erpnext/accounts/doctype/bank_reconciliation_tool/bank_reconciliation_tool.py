@@ -48,10 +48,7 @@ class BankReconciliationTool(Document):
 @frappe.whitelist()
 def get_bank_transactions(bank_account, from_date=None, to_date=None):
 	# returns bank transactions for a bank account
-	filters = []
-	filters.append(["bank_account", "=", bank_account])
-	filters.append(["docstatus", "=", 1])
-	filters.append(["unallocated_amount", ">", 0.0])
+	filters = [["bank_account", "=", bank_account], ["docstatus", "=", 1], ["unallocated_amount", ">", 0.0]]
 	if to_date:
 		filters.append(["date", "<=", to_date])
 	if from_date:
@@ -156,7 +153,7 @@ def create_journal_entry_bts(
 	)[0]
 	company_account = frappe.get_value("Bank Account", bank_transaction.bank_account, "account")
 	account_type = frappe.db.get_value("Account", second_account, "account_type")
-	if account_type in ["Receivable", "Payable"]:
+	if account_type in {"Receivable", "Payable"}:
 		if not (party_type and party):
 			frappe.throw(
 				_("Party Type and Party is required for Receivable / Payable account {0}").format(
@@ -391,16 +388,7 @@ def auto_reconcile_vouchers(
 		if not linked_payments:
 			continue
 
-		vouchers = list(
-			map(
-				lambda entry: {
-					"payment_doctype": entry.get("doctype"),
-					"payment_name": entry.get("name"),
-					"amount": entry.get("paid_amount"),
-				},
-				linked_payments,
-			)
-		)
+		vouchers = [{"payment_doctype": entry.get("doctype"), "payment_name": entry.get("name"), "amount": entry.get("paid_amount")} for entry in linked_payments]
 
 		updated_transaction = reconcile_vouchers(transaction.name, json.dumps(vouchers))
 
@@ -484,7 +472,7 @@ def subtract_allocations(gl_account, vouchers):
 	copied = []
 	for voucher in vouchers:
 		rows = get_total_allocated_amount(voucher.get("doctype"), voucher.get("name"))
-		filtered_row = list(filter(lambda row: row.get("gl_account") == gl_account, rows))
+		filtered_row = [row for row in rows if row.get("gl_account") == gl_account]
 
 		if amount := None if not filtered_row else filtered_row[0]["total"]:
 			voucher["paid_amount"] -= amount
@@ -736,7 +724,7 @@ def get_pe_matching_query(
 		.orderby(pe.reference_date if cint(filter_by_reference_date) else pe.posting_date)
 	)
 
-	if frappe.flags.auto_reconcile_vouchers == True:
+	if frappe.flags.auto_reconcile_vouchers is True:
 		query = query.where(ref_condition)
 
 	return str(query)
@@ -796,7 +784,7 @@ def get_je_matching_query(
 		.orderby(je.cheque_date if cint(filter_by_reference_date) else je.posting_date)
 	)
 
-	if frappe.flags.auto_reconcile_vouchers == True:
+	if frappe.flags.auto_reconcile_vouchers is True:
 		query = query.where(ref_condition)
 
 	return str(query)

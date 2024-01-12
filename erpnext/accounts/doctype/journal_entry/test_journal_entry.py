@@ -35,7 +35,7 @@ class TestJournalEntry(unittest.TestCase):
 		self.jv_against_voucher_testcase(base_jv, purchase_order)
 
 	def jv_against_voucher_testcase(self, base_jv, test_voucher):
-		dr_or_cr = "credit" if test_voucher.doctype in ["Sales Order", "Journal Entry"] else "debit"
+		dr_or_cr = "credit" if test_voucher.doctype in {"Sales Order", "Journal Entry"} else "debit"
 
 		test_voucher.insert()
 		test_voucher.submit()
@@ -58,7 +58,7 @@ class TestJournalEntry(unittest.TestCase):
 		)
 
 		base_jv.get("accounts")[0].is_advance = (
-			"Yes" if (test_voucher.doctype in ["Sales Order", "Purchase Order"]) else "No"
+			"Yes" if (test_voucher.doctype in {"Sales Order", "Purchase Order"}) else "No"
 		)
 		base_jv.get("accounts")[0].set("reference_type", test_voucher.doctype)
 		base_jv.get("accounts")[0].set("reference_name", test_voucher.name)
@@ -105,7 +105,7 @@ class TestJournalEntry(unittest.TestCase):
 				)
 			)
 
-		elif test_voucher.doctype in ["Sales Order", "Purchase Order"]:
+		elif test_voucher.doctype in {"Sales Order", "Purchase Order"}:
 			# if test_voucher is a Sales Order/Purchase Order, test error on cancellation of test_voucher
 			frappe.db.set_single_value(
 				"Accounts Settings", "unlink_advance_payment_on_cancelation_of_order", 0

@@ -71,11 +71,7 @@ class CurrencyExchangeSettings(Document):
 			self.append("req_params", {"key": "symbols", "value": "{to_currency}"})
 
 	def validate_parameters(self):
-		params = {}
-		for row in self.req_params:
-			params[row.key] = row.value.format(
-				transaction_date=nowdate(), to_currency="INR", from_currency="USD"
-			)
+		params = {row.key: row.value.format(transaction_date=nowdate(), to_currency="INR", from_currency="USD") for row in self.req_params}
 
 		api_url = self.api_endpoint.format(
 			transaction_date=nowdate(), to_currency="INR", from_currency="USD"

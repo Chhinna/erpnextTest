@@ -112,7 +112,7 @@ class GLEntry(Document):
 			]:
 				# Update outstanding amt on against voucher
 				if (
-					self.against_voucher_type in ["Journal Entry", "Sales Invoice", "Purchase Invoice", "Fees"]
+					self.against_voucher_type in {"Journal Entry", "Sales Invoice", "Purchase Invoice", "Fees"}
 					and self.against_voucher
 					and self.flags.update_outstanding == "Yes"
 					and not frappe.flags.is_reverse_depr_entry
@@ -419,7 +419,7 @@ def update_outstanding_amt(
 				_("Outstanding for {0} cannot be less than zero ({1})").format(against_voucher, fmt_money(bal))
 			)
 
-	if against_voucher_type in ["Sales Invoice", "Purchase Invoice", "Fees"]:
+	if against_voucher_type in {"Sales Invoice", "Purchase Invoice", "Fees"}:
 		ref_doc = frappe.get_doc(against_voucher_type, against_voucher)
 
 		# Didn't use db_set for optimization purpose

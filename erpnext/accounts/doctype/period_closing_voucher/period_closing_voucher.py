@@ -181,23 +181,14 @@ class PeriodClosingVoucher(AccountsController):
 			process_closing_entries(gl_entries, closing_entries, self.name, self.company, self.posting_date)
 
 	def get_grouped_gl_entries(self, get_opening_entries=False):
-		closing_entries = []
-		for acc in self.get_balances_based_on_dimensions(
-			group_by_account=True, for_aggregation=True, get_opening_entries=get_opening_entries
-		):
-			closing_entries.append(self.get_closing_entries(acc))
+		closing_entries = [self.get_closing_entries(acc) for acc in self.get_balances_based_on_dimensions(group_by_account=True, for_aggregation=True, get_opening_entries=get_opening_entries)]
 
 		return closing_entries
 
 	def get_gl_entries(self):
-		gl_entries = []
+		gl_entries = [self.get_gle_for_pl_account(acc) for acc in self.get_balances_based_on_dimensions(group_by_account=True, report_type="Profit and Loss") if flt(acc.bal_in_company_currency)]
 
 		# pl account
-		for acc in self.get_balances_based_on_dimensions(
-			group_by_account=True, report_type="Profit and Loss"
-		):
-			if flt(acc.bal_in_company_currency):
-				gl_entries.append(self.get_gle_for_pl_account(acc))
 
 		# closing liability account
 		for acc in self.get_balances_based_on_dimensions(

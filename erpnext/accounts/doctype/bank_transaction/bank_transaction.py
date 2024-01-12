@@ -254,7 +254,7 @@ def get_related_bank_gl_entries(doctype, docname):
 			AND gle.voucher_no = %(docname)s
 			AND is_cancelled = 0
 		""",
-		dict(doctype=doctype, docname=docname),
+		{doctype=doctype, docname=docname},
 		as_dict=True,
 	)
 
@@ -288,7 +288,7 @@ def get_total_allocated_amount(doctype, docname):
 		WHERE
 			rownum = 1
 		""",
-		dict(doctype=doctype, docname=docname),
+		{doctype=doctype, docname=docname},
 		as_dict=True,
 	)
 	for row in result:
@@ -371,7 +371,7 @@ def set_voucher_clearance(doctype, docname, clearance_date, self):
 	elif doctype == "Sales Invoice":
 		frappe.db.set_value(
 			"Sales Invoice Payment",
-			dict(parenttype=doctype, parent=docname),
+			{parenttype=doctype, parent=docname},
 			"clearance_date",
 			clearance_date,
 		)

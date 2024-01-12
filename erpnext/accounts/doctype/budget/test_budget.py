@@ -220,8 +220,7 @@ class TestBudget(unittest.TestCase):
 
 		budget = make_budget(budget_against="Cost Center")
 		month = now_datetime().month
-		if month > 9:
-			month = 9
+		month = min(month, 9)
 
 		for i in range(month + 1):
 			jv = make_journal_entry(
@@ -251,8 +250,7 @@ class TestBudget(unittest.TestCase):
 
 		budget = make_budget(budget_against="Project")
 		month = now_datetime().month
-		if month > 9:
-			month = 9
+		month = min(month, 9)
 
 		project = frappe.get_value("Project", {"project_name": "_Test Project"})
 		for i in range(month + 1):

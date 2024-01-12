@@ -169,7 +169,7 @@ class PaymentLedgerEntry(Document):
 
 		# update outstanding amount
 		if (
-			self.against_voucher_type in ["Journal Entry", "Sales Invoice", "Purchase Invoice", "Fees"]
+			self.against_voucher_type in {"Journal Entry", "Sales Invoice", "Purchase Invoice", "Fees"}
 			and self.flags.update_outstanding == "Yes"
 			and not frappe.flags.is_reverse_depr_entry
 		):
